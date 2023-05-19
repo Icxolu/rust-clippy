@@ -1,0 +1,28 @@
+error: unneccessary `.into_iter()` call in generic argument
+  --> $DIR/needless_into_iter.rs:10:36
+   |
+LL |     vec![].extend(Vec::<i32>::new().into_iter());
+   |                                    ^^^^^^^^^^^^ help: remove this call
+   |
+   = note: `-D clippy::needless-into-iter` implied by `-D warnings`
+
+error: unneccessary `.into_iter()` call in generic argument
+  --> $DIR/needless_into_iter.rs:11:19
+   |
+LL |     foo(Vec::new().into_iter());
+   |                   ^^^^^^^^^^^^ help: remove this call
+
+error: unneccessary `.into_iter()` call in generic argument
+  --> $DIR/needless_into_iter.rs:12:51
+   |
+LL |     bar(sample.clone().into_iter(), sample.clone().into_iter());
+   |                                                   ^^^^^^^^^^^^ help: remove this call
+
+error: unneccessary `.into_iter()` call in generic argument
+  --> $DIR/needless_into_iter.rs:13:28
+   |
+LL |     baz(sample, (), sample2.into_iter());
+   |                            ^^^^^^^^^^^^ help: remove this call
+
+error: aborting due to 4 previous errors
+

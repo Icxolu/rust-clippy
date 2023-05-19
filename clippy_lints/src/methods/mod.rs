@@ -57,6 +57,7 @@ mod map_identity;
 mod map_unwrap_or;
 mod mut_mutex_lock;
 mod needless_collect;
+mod needless_into_iter;
 mod needless_option_as_deref;
 mod needless_option_take;
 mod no_effect_replace;
@@ -3220,6 +3221,29 @@ declare_clippy_lint! {
     "manual reverse iteration of `DoubleEndedIterator`"
 }
 
+declare_clippy_lint! {
+    /// ### What it does
+    /// Checks for `.into_iter()` calls when not needed.
+    ///
+    /// ### Why is this bad?
+    /// Readability.
+    ///
+    /// ### Example
+    /// ```rust
+    /// let mut v = vec![];
+    /// v.extend(vec![0].into_iter());
+    /// ```
+    /// Use instead:
+    /// ```rust
+    /// let mut v = vec![];
+    /// v.extend(vec![0]);
+    /// ```
+    #[clippy::version = "1.71.0"]
+    pub NEEDLESS_INTO_ITER,
+    pedantic,
+    "explicit `.into_iter()` call is not neccessary"
+}
+
 pub struct Methods {
     avoid_breaking_exported_api: bool,
     msrv: Msrv,
@@ -3349,6 +3373,7 @@ impl_lint_pass!(Methods => [
     SUSPICIOUS_COMMAND_ARG_SPACE,
     CLEAR_WITH_DRAIN,
     MANUAL_NEXT_BACK,
+    NEEDLESS_INTO_ITER,
 ]);
 
 /// Extracts a method call name, args, and `Span` of the method name.
@@ -3650,8 +3675,11 @@ impl Methods {
                 ("is_digit", [radix]) => is_digit_ascii_radix::check(cx, expr, recv, radix, &self.msrv),
                 ("is_none", []) => check_is_some_is_none(cx, expr, recv, false),
                 ("is_some", []) => check_is_some_is_none(cx, expr, recv, true),
-                ("iter" | "iter_mut" | "into_iter", []) => {
+                (name @ ("iter" | "iter_mut" | "into_iter"), []) => {
                     iter_on_single_or_empty_collections::check(cx, expr, name, recv);
+                    if name == "into_iter" && is_trait_method(cx, expr, sym::IntoIterator) {
+                        needless_into_iter::check(cx, expr, recv, call_span);
+                    }
                 },
                 ("join", [join_arg]) => {
                     if let Some(("collect", _, _, span, _)) = method_call(recv) {

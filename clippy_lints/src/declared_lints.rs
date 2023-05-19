@@ -366,6 +366,7 @@ pub(crate) static LINTS: &[&crate::LintInfo] = &[
     crate::methods::MUT_MUTEX_LOCK_INFO,
     crate::methods::NAIVE_BYTECOUNT_INFO,
     crate::methods::NEEDLESS_COLLECT_INFO,
+    crate::methods::NEEDLESS_INTO_ITER_INFO,
     crate::methods::NEEDLESS_OPTION_AS_DEREF_INFO,
     crate::methods::NEEDLESS_OPTION_TAKE_INFO,
     crate::methods::NEEDLESS_SPLITN_INFO,
